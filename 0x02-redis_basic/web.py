@@ -10,8 +10,8 @@ def get_page(url: str) -> str:
     content = r.get(url)
     name = f"count:{url}"
     r.incr(name)
-    if not content:
-        content = get(url)
-        content = content.text
-        r.setex(url, 10, content)
-    return content
+    if content:
+        return content.decode('utf-8')
+    content = get(url)
+    r.setex(url, 10, content.text)
+    return content.text
