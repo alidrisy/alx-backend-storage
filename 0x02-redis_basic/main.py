@@ -3,4 +3,5 @@
 
 get_page = __import__('web').get_page
 
-get_page('http://slowwly.robertomurray.co.uk')
+con = get_page('http://slowwly.robertomurray.co.uk')
+print(con)
