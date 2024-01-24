@@ -10,10 +10,26 @@ def count_calls(method: Callable) -> Callable:
     """increments the count for that key every time the method is called
     and returns the value returned by the original method."""
     @wraps(method)
-    def wrapper(self, *args, **kargs):
+    def wrapper(self, *args, **kwargs):
         """wrapper for increments the count"""
         self._redis.incr(method.__qualname__)
-        return method(self, *args, **kargs)
+        return method(self, *args, **kwargs)
+    return wrapper
+
+
+def call_history(method: Callable) -> Callable:
+    """increments the count for that key every time the method is called
+    and returns the value returned by the original method."""
+    @wraps(method)
+    def wrapper(self, *args):
+        """wrapper for increments the count"""
+        incr = method.__qualname__
+        input_key = "{}:inputs".format(incr)
+        output_key = "{}:outputs".format(incr)
+        self._redis.rpush(input_key, str(args))
+        output = method(self, *args)
+        self._redis.rpush(output_key, output)
+        return output
     return wrapper
 
 
@@ -24,6 +40,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @call_history
     @count_calls
     def store(self, data:  Union[str, bytes, int, float]) -> str:
         """store data in Redis using the random key and return the key."""
