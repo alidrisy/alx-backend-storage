@@ -39,9 +39,9 @@ def replay(fn: Callable) -> None:
     input = r.lrange("{}:inputs".format(fn.__qualname__), 0, -1)
     output = r.lrange("{}:outputs".format(fn.__qualname__), 0, -1)
     print(f"{fn.__qualname__} was called {len(output)} times:")
-    for i in range(len(output)):
-        s = output[i].decode("utf-8")
-        print(f"{fn.__qualname__}(*{(input[i].decode('utf-8'))}) -> {s}")
+    for inp, outp in zip(input, output):
+        s = outp.decode("utf-8")
+        print(f"{fn.__qualname__}(*{inp.decode('utf-8')}) -> {s}")
 
 
 class Cache:
