@@ -12,14 +12,13 @@ def cache_content(fn: Callable) -> Callable:
     def wrapper(url: str) -> str:
         """wraper to check if the content exist or not"""
         r = redis.Redis()
-        content = r.get(url)
+        content = r.get(f'{url}')
         name = f"count:{url}"
         r.incr(name)
         if content:
             return content.decode('utf-8')
         content = fn(url)
-        r.setex(url, 10, content)
-        r.set(f'count:{url}', 0)
+        r.set(f"{url}", content, 10)
         return content
     return wrapper
 
