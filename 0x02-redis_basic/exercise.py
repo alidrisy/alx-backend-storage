@@ -2,7 +2,7 @@
 """ Model for the class Cache """
 import redis
 import uuid
-from typing import Union
+from typing import Union, Callable, Any
 
 
 class Cache:
@@ -17,3 +17,23 @@ class Cache:
         id: str = str(uuid.uuid4())
         self._redis.set(id, data)
         return id
+
+    def get(self, key: str, fn: Callable[[bytes], Any]) -> Union[str, bytes, int, float]:
+        """covert the data that get using key from Redis by fn"""
+
+        data = self._redis.get(key)
+        if fn is str:
+            return self.get_str(data)
+        if fn is int:
+            return self.get_int(data)
+        if callable(fn):
+            return fn(data)
+        return data
+    
+    def get_str(self, data: bytes) -> str:
+        """convert data from bytes to string"""
+        return data.decode("utf-8")
+    
+    def get_int(self, data: bytes) -> int:
+        """convert data from bytes to integer"""
+        return int(data)
