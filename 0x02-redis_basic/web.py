@@ -14,4 +14,5 @@ def get_page(url: str) -> str:
         return content.decode('utf-8')
     content = get(url)
     r.setex(url, 10, content.text)
+    r.set(f'count:{url}', 0)
     return content.text
