@@ -2,7 +2,7 @@
 """ Model for the class Cache """
 import redis
 import uuid
-from typing import Union, Callable, Any
+from typing import Union, Callable, Any, Optional
 
 
 class Cache:
@@ -18,7 +18,7 @@ class Cache:
         self._redis.set(id, data)
         return id
 
-    def get(self, key: str, fn: Callable[[bytes], Any]) -> Union[str, bytes, int, float]:
+    def get(self, key: str, fn: Optional[Callable] = None) -> Any:
         """covert the data that get using key from Redis by fn"""
 
         data = self._redis.get(key)
